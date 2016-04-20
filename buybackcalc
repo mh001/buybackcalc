@@ -33,7 +33,7 @@
 # v0.3 https://discuss.nubits.com/t/nsr-buyback-calculations/3347/56
 
 # replace this with the command that runs nud locally
-NUD=./daemon/nd
+NUD=../daemon/nd
 
 # get balance in address in $1, return balance in $tempval. Exit if timeout.
 
