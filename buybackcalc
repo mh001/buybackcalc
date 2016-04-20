@@ -49,7 +49,7 @@ function ppcBalance  { EXPL=http://ppc.blockr.io/api/v1/address/info; tempval=`c
 function ppcPrice { tempval=`curl -s https://btc-e.com/api/3/ticker/ppc_btc | awk 'BEGIN{RS=",\"";FS=":"}{print $1,$2}' | grep avg | awk '{print $2}'| tr -d \"`;if [[ $tempval == "" ]]; then echo btc-e PPC price source is down; exit; else echo btc-e PPC average price is $tempval BTC; fi }
 
 # temporary file
-TEMPLIST=templist
+TEMPLIST=/tmp/templist
 
 echo Nushares buyback calculation as of `date --utc`
 
