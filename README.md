@@ -8,13 +8,12 @@ The calculator is written so that it can be run on any generic unix computer, an
  * Ubuntu linux
  * Raspbian on a Raspberry Pi
  * Cygwin on Windows
- * DOS `cmd` window on Windows.
 
 The calculators needs to communicate with a running Nu server (`nud`) to get current Nubits moneysupply. So when running the calculator, `nud` should be running and synchronized with Nu network. You should edit the code on line
 
-`NUD=./daemon/nd`
+`NUD=../daemon/nd`
 
-to add the command line that runs `nud` on your computer. For example `./daemon/nd` is how I run `nud` on Windows command line.
+to add the command line that runs `nud` on your computer. For example `../daemon/nd` is how I run `nud` on Windows command line.
 
 ## run the calculator
 * On linux or Cygwin, just run
@@ -22,12 +21,6 @@ to add the command line that runs `nud` on your computer. For example `./daemon/
 `./buybackcalc`
 
 if execution permission is set for the script. 
-
-* In a DOS `cmd` window, I run the script with
-
-`bash buybackcalc` 
-
-where bash is Cygwin binary.
 
 * If `nud` is not running and you know the Nubits moneysupply, you can uncomment the line
 
