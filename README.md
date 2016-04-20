@@ -29,7 +29,7 @@ if execution permission is set for the script.
 
 where bash is Cygwin binary.
 
-* If nud is not running and you know the Nubits moneysupply, you can uncomment the line
+* If `nud` is not running and you know the Nubits moneysupply, you can uncomment the line
 
 `#totalNBT=`
 
