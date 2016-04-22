@@ -22,6 +22,7 @@
 #OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # Change log
+# v0.8 add command line options and read NBT moneysupply from alix. enhance output readability
 # v0.7.1 Nusafe url and explanation. Clean up code before opensource due to https://discuss.nubits.com/t/passed-grant-for-nsr-buyback-and-ppc-reserve-operation-calculator/3752.
 # v0.7 implement PPC reserve and BTC reserve percentage https://discuss.nubits.com/t/passed-peercoin-flot-reserve/3337/1 and https://discuss.nubits.com/t/passed-bitcoin-reserve/3566/1
 # v0.6 NuSafe not counted in for buyback calculation https://discuss.nubits.com/t/passed-bitcoin-reserve/3566/18 
@@ -31,9 +32,6 @@
 # v0.4.1 update Jordan Lee's T4 BTC holdings
 # v0.4 update Jordan Lee's T4 BTC holdings; comment out gateways; add NuSafe
 # v0.3 https://discuss.nubits.com/t/nsr-buyback-calculations/3347/56
-
-# replace this with the command that runs nud locally
-NUD=../daemon/nd
 
 # get balance in address in $1, return balance in $tempval. Exit if timeout.
 
@@ -53,31 +51,66 @@ TEMPLIST=/tmp/templist
 
 echo Nushares buyback calculation as of `date --utc`
 
-$NUD --unit=B getinfo | grep 'blocks'
-totalNBT=`$NUD --unit=B getinfo | awk '$1 ~ /moneysupply/{print $3}' | tr -d ,`
+# parse command line
+options=`getopt -o t,n,m: -l test,nud,moneysupply: -- "$@"`
+#echo $options
+eval set -- "$options"
+
+while [ $# -gt 0 ]; do
+  case $1 in
+#  -t|--test) echo Test run; test=1;shift;;
+  -n|--nud) echo Get moneysupply from nud; useNud=1; shift;;
+  -m|--moneysupply) echo Moneysupply is set to $2; manual=1; moneysupply=$2;shift;;
+  (--) shift; break;;
+  (-*) break;;
+  (*) break;;
+  esac
+  shift
+done
+
+# replace this with the command that runs nud locally
+NUD=../daemon/nd;
+
+if [[ $useNud == "1" ]]; then
+  $NUD --unit=B getinfo | grep 'blocks';
+  totalNBT=`$NUD --unit=B getinfo | awk '$1 ~ /moneysupply/{print $3}' | tr -d ,`;
+else 
+     totalNBT=`curl -s https://alix.coinerella.com/panel/api/?getinfo | awk 'BEGIN{RS=",\"";FS=":"}{print $1,$2}' | grep moneysupply_nbt | awk '{print $2}'`;
+     if [[ $totalNBT == "" ]]; then
+     	 echo Failed to get moneysupply from https://alix.coinerella.com;
+	 exit;
+     fi
+fi
+
+if [[ $manual == "1" ]]; then
 # Use this to manually set the total Nubits money supply if unable to run nud
-#totalNBT=
+  totalNBT=$moneysupply
+fi
+
+
 echo Total NBT = $totalNBT
 echo $totalNBT > $TEMPLIST
 echo
 
-echo FSRT multisig
+echo Uncirculating Nubits
+echo
+echo \* FSRT multisig
 nbtBalance BhCnQrYrA5LZm871dtMQEXeU93gmqbhdrC
 echo $tempval >> $TEMPLIST
 
-echo FSRT singlesig
+echo \* FSRT singlesig
 nbtBalance BFTnCyMX1nsTNp6X7Bcm1qVocvShdbwtMi
 echo $tempval >> $TEMPLIST
 
-echo JordanLee singlesig
+echo \* JordanLee singlesig
 nbtBalance B5Zi5XJ1sgS6mWGu7bWJqGVnuXwiMXi7qj
 echo $tempval >> $TEMPLIST
 
-echo JordanLee singlesig [from liquidity ops]\(https://discuss.nubits.com/t/nsr-buyback-calculations/3347/90\)
+echo \* JordanLee singlesig [from liquidity ops]\(https://discuss.nubits.com/t/nsr-buyback-calculations/3347/90\)
 nbtBalance BT9AWq9r1i6kghZc6LtrvNb2wRFh7JLCdP
 echo $tempval >> $TEMPLIST
 
-echo FLOT 3-of-5 multisig
+echo \* FLOT 3-of-5 multisig
 nbtBalance BqyRzFtWXDmjxrYpyJD42MLE5xc8FrB4js
 echo $tempval >> $TEMPLIST
 
@@ -92,25 +125,26 @@ echo
 echo **Tier 4 Funds**
 echo
 echo Tier 4 buy side funds controlled by FLOT
-echo FLOT 5-of-8 multisig old
+echo \* FLOT 5-of-8 multisig old
 btcBalance 3QDWJ2yqJ5iTUg6cSpAwxx95ba3NG97hzG
 echo $tempval > $TEMPLIST
 
-echo FLOT 5-of-8 multisig new
+echo \* FLOT 5-of-8 multisig new
 btcBalance 3HikFkS2Zinab1TJq7dqp6wSPyLu7i7bhe
 echo $tempval >> $TEMPLIST
 
 jltbc=59.8
-echo Tier 4 buy side funds controlled by JordanLee [$jltbc BTC]\(https://discuss.nubits.com/t/nsr-buyback-calculations/3347/124\)
+echo \* Tier 4 buy side funds controlled by JordanLee [$jltbc BTC]\(https://discuss.nubits.com/t/nsr-buyback-calculations/3347/124\)
 echo $jltbc >> $TEMPLIST
 
 nuSafe=30000
-echo NuSafe has [\$$nuSafe]\(https://discuss.nubits.com/t/passed-nusafe-an-30k-hedge-of-tier-4-funds-in-usd/3215\) for T4, but [not included for buyback pool calculation]\(https://discuss.nubits.com/t/passed-bitcoin-reserve/3566/15\).
+echo \* NuSafe has [\$$nuSafe]\(https://discuss.nubits.com/t/passed-nusafe-an-30k-hedge-of-tier-4-funds-in-usd/3215\) for T4, but [not included for buyback pool calculation]\(https://discuss.nubits.com/t/passed-bitcoin-reserve/3566/15\).
 
-echo FLOT 3-of-5 multisig Peercoin
+echo \* FLOT 3-of-5 multisig Peercoin
 ppcBalance pM68K72BBa2KX7Kj2qY5jgTB3AmCUKFQmV
 ppcReserve=$tempval
 
+# Get BTC and PPC prices
 echo
 btcPrice
 bp=$tempval
