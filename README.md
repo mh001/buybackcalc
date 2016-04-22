@@ -9,12 +9,6 @@ The calculator is written so that it can be run on any generic unix computer, an
  * Raspbian on a Raspberry Pi
  * Cygwin on Windows
 
-The calculators needs to communicate with a running Nu server (`nud`) to get current Nubits moneysupply. So when running the calculator, `nud` should be running and synchronized with Nu network. You should edit the code on line
-
-`NUD=../daemon/nd`
-
-to add the command line that runs `nud` on your computer. For example `../daemon/nd` is how I run `nud` on Windows command line.
-
 ## run the calculator
 * On linux or Cygwin, just run
 
@@ -22,8 +16,14 @@ to add the command line that runs `nud` on your computer. For example `../daemon
 
 if execution permission is set for the script. 
 
-* If `nud` is not running and you know the Nubits moneysupply, you can uncomment the line
+* By default the calculator uses https://alix.coinerella.com/panel/api/?getinfo to get Nubits moneysupply online. If alix cannot be used, the calculators can communicate with a running Nu server (`nud`) to get current Nubits moneysupply. In this case when running the calculator, `nud` should be running and synchronized with Nu network. You should edit the code at line
 
-`#totalNBT=`
+`NUD=../daemon/nd`
 
-and add Nubits moneysupply by hand. The calculation results would be correct.
+to add the command line that runs `nud` on your computer. For example `../daemon/nd` is how I run `nud` on Windows command line. After these change, you can run the calculator using `nud`
+
+`buybackcalc -n`
+
+* If you want to set the Nubits moneysupply by hand, you can run the calculator
+
+`buybackcalc -m _<moneyspply>_`
