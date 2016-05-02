@@ -22,6 +22,8 @@
 #OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # Change log
+# v0.8.2 show totalparked nbt but do not use in calculation. add nud else case.
+# v0.8.1 
 # v0.8 add command line options and read NBT moneysupply from alix. enhance output readability
 # v0.7.1 Nusafe url and explanation. Clean up code before opensource due to https://discuss.nubits.com/t/passed-grant-for-nsr-buyback-and-ppc-reserve-operation-calculator/3752.
 # v0.7 implement PPC reserve and BTC reserve percentage https://discuss.nubits.com/t/passed-peercoin-flot-reserve/3337/1 and https://discuss.nubits.com/t/passed-bitcoin-reserve/3566/1
@@ -72,16 +74,23 @@ done
 NUD=../daemon/nd;
 
 if [[ $useNud == "1" ]]; then
-  $NUD --unit=B getinfo | grep 'blocks';
-  totalNBT=`$NUD --unit=B getinfo | awk '$1 ~ /moneysupply/{print $3}' | tr -d ,`;
+  $NUD --unit=B getinfo | tee $TEMPLIST | grep 'blocks';
+  totalNBT=`cat $TEMPLIST | awk '$1 ~ /moneysupply/{print $3}' | tr -d ,`;
+  totalparked=`cat $TEMPLIST | awk '$1 ~ /totalparked/{print $3}' | tr -d ,`;
+  if [[ $totalNBT == "" ]]; then
+      echo Failed to get moneysupply from nud;
+      exit;
+  fi
 else 
-     totalNBT=`curl -s https://alix.coinerella.com/panel/api/?getinfo | awk 'BEGIN{RS=",\"";FS=":"}{print $1,$2}' | grep moneysupply_nbt | awk '{print $2}'`;
+     curl -s https://alix.coinerella.com/panel/api/?getinfo | awk 'BEGIN{RS=",\"";FS=":"}{print $1,$2}' | tee $TEMPLIST | grep blocks | tr \  :;
+     totalNBT=`cat $TEMPLIST | grep moneysupply_nbt | awk '{print $2}'`;
+     totalparked=`cat $TEMPLIST | grep totalparked | awk '{print $2}'`;
      if [[ $totalNBT == "" ]]; then
      	 echo Failed to get moneysupply from https://alix.coinerella.com;
 	 exit;
      fi
 fi
-
+exit
 if [[ $manual == "1" ]]; then
 # Use this to manually set the total Nubits money supply if unable to run nud
   totalNBT=$moneysupply
@@ -92,7 +101,7 @@ echo Total NBT = $totalNBT
 echo $totalNBT > $TEMPLIST
 echo
 
-echo Uncirculating Nubits
+echo **Uncirculating Nubits**
 echo
 echo \* FSRT multisig
 nbtBalance BhCnQrYrA5LZm871dtMQEXeU93gmqbhdrC
@@ -113,6 +122,9 @@ echo $tempval >> $TEMPLIST
 echo \* FLOT 3-of-5 multisig
 nbtBalance BqyRzFtWXDmjxrYpyJD42MLE5xc8FrB4js
 echo $tempval >> $TEMPLIST
+
+echo \* Total parked Nubits is $totalparked. They are not used in circulating nubits calculation for buyback purposes.
+#echo $tempval >> $TEMPLIST
 
 #cat $TEMPLIST
 # calculate total circulating nubits using the first line minus rest of the lines
@@ -182,7 +194,7 @@ PPC_buy_BTC_threshold=1000
 # PPC-reserve-overflow < 0 fill PPC reserve according to standard.
 awk  '{bsBtc += $1}END{\
 totalBuyside = bsBtc+ppcReserve*PPCP+NS/BTCP;\
-printf "Tier 4 buy side funds total %f BTC, %f PPC, and $%f, valued $%f (%f BTC)\n\n",\
+printf "Tier 4 buy side funds %f BTC, %f PPC, and $%f, valued $%f (%f BTC)\n\n",\
 bsBtc,ppcReserve,NS,totalBuyside*BTCP,totalBuyside;\
 \
 excludedBTC=(circNBT*resFrac + NS)/BTCP;\
