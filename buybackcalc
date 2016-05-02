@@ -23,7 +23,7 @@
 #
 # Change log
 # v0.8.2 show totalparked nbt but do not use in calculation. add nud else case.
-# v0.8.1 
+# v0.8.1 less calls with a temp file
 # v0.8 add command line options and read NBT moneysupply from alix. enhance output readability
 # v0.7.1 Nusafe url and explanation. Clean up code before opensource due to https://discuss.nubits.com/t/passed-grant-for-nsr-buyback-and-ppc-reserve-operation-calculator/3752.
 # v0.7 implement PPC reserve and BTC reserve percentage https://discuss.nubits.com/t/passed-peercoin-flot-reserve/3337/1 and https://discuss.nubits.com/t/passed-bitcoin-reserve/3566/1
@@ -90,7 +90,7 @@ else
 	 exit;
      fi
 fi
-exit
+
 if [[ $manual == "1" ]]; then
 # Use this to manually set the total Nubits money supply if unable to run nud
   totalNBT=$moneysupply
