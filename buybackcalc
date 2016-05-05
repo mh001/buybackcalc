@@ -22,6 +22,7 @@
 #OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # Change log
+# v0.8.3 update JL's BTC. http...3347/170
 # v0.8.2 show totalparked nbt but do not use in calculation. add nud else case.
 # v0.8.1 less calls with a temp file
 # v0.8 add command line options and read NBT moneysupply from alix. enhance output readability
@@ -145,8 +146,8 @@ echo \* FLOT 5-of-8 multisig new
 btcBalance 3HikFkS2Zinab1TJq7dqp6wSPyLu7i7bhe
 echo $tempval >> $TEMPLIST
 
-jltbc=59.8
-echo \* Tier 4 buy side funds controlled by JordanLee [$jltbc BTC]\(https://discuss.nubits.com/t/nsr-buyback-calculations/3347/124\)
+jltbc=126.04
+echo \* Tier 4 buy side funds controlled by JordanLee [$jltbc BTC]\(https://discuss.nubits.com/t/nsr-buyback-calculations/3347/170\)
 echo $jltbc >> $TEMPLIST
 
 nuSafe=30000
