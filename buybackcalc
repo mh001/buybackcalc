@@ -22,8 +22,8 @@
 #OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # Change log
-# v0.8.4 update JL's BTC. http...3347/170
-# v0.8.3 update JL's BTC. http...3347/176
+# v0.8.4 update JL's BTC. http...3347/176
+# v0.8.3 update JL's BTC. http...3347/170
 # v0.8.2 show totalparked nbt but do not use in calculation. add nud else case.
 # v0.8.1 less calls with a temp file
 # v0.8 add command line options and read NBT moneysupply from alix. enhance output readability
