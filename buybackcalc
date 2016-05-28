@@ -22,6 +22,8 @@
 #OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # Change log
+# v0.9.3 update BTC held by JL https://discuss.nubits.com/t/current-liquidity/1239/1711
+# v0.9.2 output format fix
 # v0.9.1 use buyside BTC instead of full reserve; revision of standard and core https://discuss.nubits.com/t/revision-standard-and-core/3932
 # v0.9 implement Outstanding Nubits https://discuss.nubits.com/t/voting-outstanding-nubits/3750 and Standard and Core https://discuss.nubits.com/t/passed-standard-and-core/3767
 # v0.8.4 update JL's BTC. http...3347/176
@@ -140,17 +142,17 @@ echo
 
 echo **Tier 4 Funds**
 echo
-echo Tier 4 buy side funds controlled by FLOT
-echo \* FLOT 5-of-8 multisig old
+echo \* Tier 4 buy side funds controlled by FLOT
+echo FLOT 5-of-8 multisig old
 btcBalance 3QDWJ2yqJ5iTUg6cSpAwxx95ba3NG97hzG
 echo $tempval > $TEMPLIST
 
-echo \* FLOT 5-of-8 multisig new
+echo FLOT 5-of-8 multisig new
 btcBalance 3HikFkS2Zinab1TJq7dqp6wSPyLu7i7bhe
 echo $tempval >> $TEMPLIST
 
-jltbc=26.04
-echo \* Tier 4 buy side funds controlled by JordanLee [$jltbc BTC]\(https://discuss.nubits.com/t/nsr-buyback-calculations/3347/176\)
+jltbc=0
+echo \* Tier 4 buy side funds controlled by JordanLee [$jltbc BTC]\(https://discuss.nubits.com/t/current-liquidity/1239/1711\)
 echo $jltbc >> $TEMPLIST
 
 nuSafe=30000
