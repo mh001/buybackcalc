@@ -22,6 +22,7 @@
 #OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # Change log
+# v0.9.3 NuSafe emptied. Cosmetic words.
 # v0.9.3 update BTC held by JL https://discuss.nubits.com/t/current-liquidity/1239/1711
 # v0.9.2 output format fix
 # v0.9.1 use buyside BTC instead of full reserve; revision of standard and core https://discuss.nubits.com/t/revision-standard-and-core/3932
@@ -155,8 +156,8 @@ jltbc=0
 echo \* Tier 4 buy side funds controlled by JordanLee [$jltbc BTC]\(https://discuss.nubits.com/t/current-liquidity/1239/1711\)
 echo $jltbc >> $TEMPLIST
 
-nuSafe=30000
-echo \* NuSafe has [\$$nuSafe]\(https://discuss.nubits.com/t/passed-nusafe-an-30k-hedge-of-tier-4-funds-in-usd/3215\) for T4, but [not included for buyback pool calculation]\(https://discuss.nubits.com/t/passed-bitcoin-reserve/3566/15\).
+nuSafe=0
+echo \* NuSafe has [\$$nuSafe]\(https://discuss.nubits.com/t/flot-btc-operations-buy-side/3117/711\) for T4, and is [not included for buyback pool calculation]\(https://discuss.nubits.com/t/passed-bitcoin-reserve/3566/15\).
 
 echo \* FLOT 3-of-5 multisig Peercoin
 ppcBalance pM68K72BBa2KX7Kj2qY5jgTB3AmCUKFQmV
@@ -206,7 +207,7 @@ printf "Tier 4 buy side funds %f BTC, %f PPC, and $%f, valued $%f (%f BTC)\n\n",
 bsBTC,ppcReserve,NS,totalBuyside*BTCP,totalBuyside;\
 \
 outstandingNBT = circNBT -  NS;\
-printf "Of the %f NBT in circulation, %f - %f = %f NBT are outstanding.\n\n",\
+printf "Of the %f NBT in circulation, %f - %f(NuSafe) = %f NBT are outstanding.\n\n",\
 circNBT,circNBT,NS,outstandingNBT;\
 \
 excludedNBT = outstandingNBT * resFrac;\
