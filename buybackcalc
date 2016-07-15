@@ -22,7 +22,8 @@
 #OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # Change log
-# v0.9.3 NuSafe emptied. Cosmetic words.
+# v0.10 100% resereve. https://discuss.nubits.com/t/passed-temporarily-cap-nbt-supply-with-full-reserve/4107 ; dislay NBT prices in BTC and USD ; remove "\"
+# v0.9.4 NuSafe emptied. Cosmetic words.
 # v0.9.3 update BTC held by JL https://discuss.nubits.com/t/current-liquidity/1239/1711
 # v0.9.2 output format fix
 # v0.9.1 use buyside BTC instead of full reserve; revision of standard and core https://discuss.nubits.com/t/revision-standard-and-core/3932
@@ -169,6 +170,9 @@ btcPrice
 bp=$tempval
 ppcPrice
 pp=$tempval
+# poloniex nbt price
+curl -s https://poloniex.com/public?command=returnTicker | awk 'BEGIN{RS="NBT";FS=","}{if (n==1)print $2,$3,$4;n+=1}'| tr -s \" " " | awk '{print "Poloniex NBT/BTC",$3," $",$3*BTCP}' BTCP=$bp | tee foo
+echo The following calculations use 1 NBT = \$1.
 echo
 
 #
@@ -183,7 +187,7 @@ echo
 #echo 330 > $TEMPLIST
 
 # the reserved ratio of Nubits excluded for buyback calculation.
-reserve_fraction=0.15
+reserve_fraction=1
 # NSR buyback ratio against buyback pool
 NSR_bb_ratio=0.05
 # NSR buyback threshold
@@ -201,45 +205,45 @@ PPCTH=1000
 # calculate buyside fund in BTC, total reserve, buyback pool, the Standard
 # NSR buyback amount, PPC reserve overflow buy BTC. Finally if poo>0 and 
 # PPC-reserve-overflow < 0 fill PPC reserve according to standard.
-awk  '{bsBTC += $1}END{\
-totalBuyside = bsBTC+ppcReserve*PPCP+NS/BTCP;\
-printf "Tier 4 buy side funds %f BTC, %f PPC, and $%f, valued $%f (%f BTC)\n\n",\
-bsBTC,ppcReserve,NS,totalBuyside*BTCP,totalBuyside;\
-\
-outstandingNBT = circNBT -  NS;\
-printf "Of the %f NBT in circulation, %f - %f(NuSafe) = %f NBT are outstanding.\n\n",\
-circNBT,circNBT,NS,outstandingNBT;\
-\
-excludedNBT = outstandingNBT * resFrac;\
-printf "%.2f percent of outstanding Nubits, %f NBT (%f BTC), are reserved and excluded from the share buyback calculation.\n\n",\
-resFrac*100,excludedNBT,excludedNBT/BTCP;\
-\
+awk  '{bsBTC += $1}END{
+totalBuyside = bsBTC+ppcReserve*PPCP+NS/BTCP;
+printf "Tier 4 buy side funds %f BTC, %f PPC, and $%f, valued $%f (%f BTC)\n\n",
+bsBTC,ppcReserve,NS,totalBuyside*BTCP,totalBuyside;
+
+outstandingNBT = circNBT -  NS;
+printf "Of the %f NBT in circulation, %f - %f(NuSafe) = %f NBT are outstanding.\n\n",
+circNBT,circNBT,NS,outstandingNBT;
+
+excludedNBT = outstandingNBT * resFrac;
+printf "%.2f percent of outstanding Nubits, %f NBT (%f BTC), are reserved and excluded from the share buyback calculation.\n\n",
+resFrac*100,excludedNBT,excludedNBT/BTCP;
+
 poolNBT = bsBTC*BTCP - excludedNBT;
-pool= bsBTC - excludedNBT/BTCP;\
-printf "%f - %f = %f BTC (%f - %f = %f NBT) are in the share buyback pool.\n",\
-bsBTC,excludedNBT/BTCP,pool,totalBuyside*BTCP,excludedNBT,poolNBT;\
-\
-standard = pool*NSR_bb_ratio;\
-standardNBT = poolNBT*NSR_bb_ratio;\
-printf "The *Standard* is %.2f percent of this, %.4f BTC (~ %.2f NBT)\n\n",\
-NSR_bb_ratio*100,standard,standardNBT;\
-\
-if (standardNBT > NSR_bb_threshold) {printf "Standard > %.0f: **Buy %.2f NBT (%.4f BTC) amount of NSR next week.**\n\n",NSR_bb_threshold,standardNBT,standard} \
-else if (standardNBT < -NSR_bb_threshold) {printf "Standard < -%.0f: **Sell %.2f NBT (%.4f BTC) amount of NSR next week.**\n\n",NSR_bb_threshold,-standardNBT,-standard} \
-else {printf "**There will be no NSR buy or sell next week.**\n\n";}\
-\
-F = (PPCTR / resFrac) * (PPCV / NSR_bb_ratio);\
-printf "Auxiliary reserve flow is %f\n",F;\
-PPCST = PPCV * (ppcReserve*PPCP*BTCP - PPCTR * outstandingNBT);\
-printf "PPC Standard is %f NBT\n\n",PPCST;\
-\
-STF = standardNBT * F;\
-if (STF > PPCTH) {printf "Standard x F (%f) > %.0f: **Buy %.2f NBT (%.4f BTC) amount of PPC next week.**\n\n",STF,PPCTH,STF,standard*F} \
-else if (STF < -PPCTH) {printf "Standard x F (%f) < -%.0f: **Sell %.2f NBT (%.4f BTC) amount of PPC next week.**\n\n",STF,PPCTH,STF,-standard*F} \
-else {printf "%.0f < Standard x F (%f) < %.0f: **There will be no PPC reserve buy or sell next week.**\n",STF,-PPCTH,PPCTH;}\
-\
-if (PPCST > PPCTH) printf "%f > %f: **Sell %f NBT amount of PPC reserve next week.**\n", PPCST, PPCTH, PPCST;\
-\
+pool= bsBTC - excludedNBT/BTCP;
+printf "%f - %f = %f BTC (%f - %f = %f NBT) are in the share buyback pool.\n",
+bsBTC,excludedNBT/BTCP,pool,totalBuyside*BTCP,excludedNBT,poolNBT;
+
+standard = pool*NSR_bb_ratio;
+standardNBT = poolNBT*NSR_bb_ratio;
+printf "The *Standard* is %.2f percent of this, %.4f BTC (~ %.2f NBT)\n\n",
+NSR_bb_ratio*100,standard,standardNBT;
+
+if (standardNBT > NSR_bb_threshold) {printf "Standard > %.0f: **Buy %.2f NBT (%.4f BTC) amount of NSR next week.**\n\n",NSR_bb_threshold,standardNBT,standard} 
+else if (standardNBT < -NSR_bb_threshold) {printf "Standard < -%.0f: **Sell %.2f NBT (%.4f BTC) amount of NSR next week.**\n\n",NSR_bb_threshold,-standardNBT,-standard} 
+else {printf "**There will be no NSR buy or sell next week.**\n\n";}
+
+F = (PPCTR / resFrac) * (PPCV / NSR_bb_ratio);
+printf "Auxiliary reserve flow is %f\n",F;
+PPCST = PPCV * (ppcReserve*PPCP*BTCP - PPCTR * outstandingNBT);
+printf "PPC Standard is %f NBT\n\n",PPCST;
+
+STF = standardNBT * F;
+if (STF > PPCTH) {printf "Standard x F (%f) > %.0f: **Buy %.2f NBT (%.4f BTC) amount of PPC next week.**\n\n",STF,PPCTH,STF,standard*F} 
+else if (STF < -PPCTH) {printf "Standard x F (%f) < -%.0f: **Sell %.2f NBT (%.4f BTC) amount of PPC next week.**\n\n",STF,PPCTH,STF,-standard*F} 
+else {printf "%.0f < Standard x F (%f) < %.0f: **There will be no PPC reserve buy or sell next week.**\n",STF,-PPCTH,PPCTH;}
+
+if (PPCST > PPCTH) printf "%f > %f: **Sell %f NBT amount of PPC reserve next week.**\n", PPCST, PPCTH, PPCST;
+
 }' circNBT=$circNBT ppcReserve=$ppcReserve NS=$nuSafe BTCP=$bp PPCP=$pp resFrac=$reserve_fraction PPCTR=$PPCTR PPCV=$PPCV PPCres_fill_ratio=$PPCres_fill_ratio NSR_bb_ratio=$NSR_bb_ratio NSR_bb_threshold=$NSR_bb_threshold PPCTH=$PPCTH $TEMPLIST
 
 exit
