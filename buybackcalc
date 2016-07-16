@@ -22,6 +22,7 @@
 #OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # Change log
+# v0.10.1 remove local tmp file
 # v0.10 100% resereve. https://discuss.nubits.com/t/passed-temporarily-cap-nbt-supply-with-full-reserve/4107 ; dislay NBT prices in BTC and USD ; remove "\"
 # v0.9.4 NuSafe emptied. Cosmetic words.
 # v0.9.3 update BTC held by JL https://discuss.nubits.com/t/current-liquidity/1239/1711
@@ -171,7 +172,7 @@ bp=$tempval
 ppcPrice
 pp=$tempval
 # poloniex nbt price
-curl -s https://poloniex.com/public?command=returnTicker | awk 'BEGIN{RS="NBT";FS=","}{if (n==1)print $2,$3,$4;n+=1}'| tr -s \" " " | awk '{print "Poloniex NBT/BTC",$3," $",$3*BTCP}' BTCP=$bp | tee foo
+curl -s https://poloniex.com/public?command=returnTicker | awk 'BEGIN{RS="NBT";FS=","}{if (n==1)print $2,$3,$4;n+=1}'| tr -s \" " " | awk '{print "Poloniex NBT/BTC",$3," $",$3*BTCP}' BTCP=$bp
 echo The following calculations use 1 NBT = \$1.
 echo
 
