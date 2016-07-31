@@ -22,6 +22,7 @@
 #OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # Change log
+# v0.10.2 add -b to specify block height manually. change default nud name
 # v0.10.1 remove local tmp file
 # v0.10 100% resereve. https://discuss.nubits.com/t/passed-temporarily-cap-nbt-supply-with-full-reserve/4107 ; dislay NBT prices in BTC and USD ; remove "\"
 # v0.9.4 NuSafe emptied. Cosmetic words.
@@ -59,19 +60,21 @@ function ppcPrice { tempval=`curl -s https://btc-e.com/api/3/ticker/ppc_btc | aw
 
 # temporary file
 TEMPLIST=/tmp/templist
+block=0
 
 echo Nushares buyback calculation as of `date --utc`
 
 # parse command line
-options=`getopt -o t,n,m: -l test,nud,moneysupply: -- "$@"`
+options=`getopt -o t,n,m:,b: -l test,nud,moneysupply,blockheight: -- "$@"`
 #echo $options
 eval set -- "$options"
 
 while [ $# -gt 0 ]; do
   case $1 in
-#  -t|--test) echo Test run; test=1;shift;;
-  -n|--nud) echo Get moneysupply from nud; useNud=1; shift;;
-  -m|--moneysupply) echo Moneysupply is set to $2; manual=1; moneysupply=$2;shift;;
+#  -t|--test) echo Test run; test=1;;
+  -n|--nud) echo Get moneysupply from nud; useNud=1;;
+  -m|--moneysupply) manual=1; moneysupply=$2;shift;;
+  -b|--blockheight) manual=1; block=$2;shift;;
   (--) shift; break;;
   (-*) break;;
   (*) break;;
@@ -80,7 +83,9 @@ while [ $# -gt 0 ]; do
 done
 
 # replace this with the command that runs nud locally
-NUD=../daemon/nd;
+NUD=../nud;
+
+if [[ $manual != 1 ]]; then
 
 if [[ $useNud == "1" ]]; then
   $NUD --unit=B getinfo | tee $TEMPLIST | grep 'blocks';
@@ -99,10 +104,13 @@ else
 	 exit;
      fi
 fi
+else
 
-if [[ $manual == "1" ]]; then
-# Use this to manually set the total Nubits money supply if unable to run nud
+# Use this to manually set the block height and total Nubits money supply if unable to run nud or read from elsewhere
+  echo Blockheight is set to $block; 
   totalNBT=$moneysupply
+  echo Moneysupply is set to $totalNBT
+  echo
 fi
 
 
