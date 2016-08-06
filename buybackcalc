@@ -22,6 +22,7 @@
 #OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # Change log
+# v0.11 add and use bitstamp last price for BTC/USD
 # v0.10.2 add -b to specify block height manually. change default nud name
 # v0.10.1 remove local tmp file
 # v0.10 100% resereve. https://discuss.nubits.com/t/passed-temporarily-cap-nbt-supply-with-full-reserve/4107 ; dislay NBT prices in BTC and USD ; remove "\"
@@ -52,7 +53,11 @@ function nbtBalance { EXPL=http://blockexplorer.nu/api/addressInfo; tempval=`cur
 
 function btcBalance  { EXPL=http://btc.blockr.io/api/v1/address/info; tempval=`curl -s $EXPL/$1 | awk 'BEGIN{RS=",\"";FS=":"}{print $1,$2}' | grep  balance\" | awk '{print $2}'`;if [[ $tempval == "" ]]; then echo Failed to get balance from $EXPL; exit; else echo Balance of [$1]\($EXPL/$1\) is $tempval BTC; fi }
 
-function btcPrice { tempval=`curl -s https://api.bitfinex.com/v1/pubticker/btcusd | awk 'BEGIN{RS=",\"";FS=":"}{print $1,$2}' | grep mid | awk '{print $2}'| tr -d \"`;if [[ $tempval == "" ]]; then echo bitfinex BTC price source is down; exit; else echo bitfinex BTC mid price is $tempval USD; fi }
+# bitfinex btc price
+#function btcPrice { tempval=`curl -s https://api.bitfinex.com/v1/pubticker/btcusd | awk 'BEGIN{RS=",\"";FS=":"}{print $1,$2}' | grep mid | awk '{print $2}'| tr -d \"`;if [[ $tempval == "" ]]; then echo bitfinex BTC price source is down; exit; else echo bitfinex BTC mid price is $tempval USD; fi }
+
+# bitstamp btc price
+function btcPrice { tempval=`curl -s https://www.bitstamp.net/api/v2/ticker/btcusd | tr -s \" " " | awk '{print $8}'`;if [[ $tempval == "" ]]; then echo bitstamp BTC price source is down; exit; else echo bitstamp BTC last price is $tempval USD; fi }
 
 function ppcBalance  { EXPL=http://ppc.blockr.io/api/v1/address/info; tempval=`curl -s $EXPL/$1 | awk 'BEGIN{RS=",\"";FS=":"}{print $1,$2}' | grep  balance\" | awk '{print $2}'`;if [[ $tempval == "" ]]; then echo Failed to get balance from $EXPL; exit; else echo Balance of [$1]\($EXPL/$1\) is $tempval PPC; fi }
 
